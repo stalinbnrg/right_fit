@@ -7,11 +7,12 @@ module.exports = (sequelize) => {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
-        autoincrement: true,
+        autoIncrement: true,
       },
       user_id: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
+        unique: true,
       },
       preferred_age_min: { type: DataTypes.INTEGER.UNSIGNED, allowNull: true },
       preferred_age_max: { type: DataTypes.INTEGER.UNSIGNED, allowNull: true },
@@ -57,7 +58,7 @@ module.exports = (sequelize) => {
     },
     {
       tableName: "user_expectations",
-      timeStamps: true,
+      timestamps: true,
     }
   );
   return UserExpectation;

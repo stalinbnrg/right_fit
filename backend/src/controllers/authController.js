@@ -27,7 +27,10 @@ exports.sendOtp = [
     try {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       setOtp(email, otp, OTP_TTL, "auth", {
-        info: { full_name, dob, gender, phone_number },
+        full_name,
+        dob,
+        gender,
+        phone_number,
       });
 
       await sendOtpEmail(email, otp);
@@ -64,7 +67,7 @@ exports.verifyOtp = [
       let user = await UserProfile.findOne({ where: { email } });
 
       if (!user) {
-        const info = entry.info || entry.data || {};
+        const info = entry.basicInfo || {};
         const age = info.dob ? calculateAge(info.dob) : null;
         user = await UserProfile.create({
           full_name: info.full_name || "New User",
