@@ -1,4 +1,4 @@
-// src/pages/Home.jsx
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -9,29 +9,31 @@ const Home = () => {
 
   return (
     <div className="container-fluid p-0">
-      {/* Hero Section */}
+ 
       <section
-        className="d-flex align-items-center text-white"
+        className="d-flex align-items-center text-white w-100"
         style={{
           backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
-          minHeight: "100vh",
-          marginRight: "-23rem",
+          minHeight: "100vcdh",
+          width: "100vw", 
+          padding: 0,
           position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Overlay */}
+    
         <div
           className="position-absolute top-0 start-0 w-100 h-100"
           style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
         ></div>
 
-        {/* Content */}
+        
         <div className="container position-relative py-5">
           <div className="row align-items-center justify-content-center">
-            {/* Left Side */}
+            
             <div className="col-12 col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
               <img
                 src={logo}
@@ -51,7 +53,7 @@ const Home = () => {
               </button>
             </div>
 
-            {/* Right Side */}
+          
             <div className="col-12 col-lg-5 text-center bg-dark bg-opacity-50 rounded-3 p-4">
               <h4 className="fw-semibold mb-3 fs-5 fs-lg-4">New User?</h4>
               <button
@@ -79,22 +81,22 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Info Section */}
-      <section className="container py-5 d-none d-md-block">
+   
+      <section className="container py-5">
         <div className="row text-center">
-          <div className="col-md-4 mb-4">
+          <div className="col-12 col-md-4 mb-4">
             <h4 className="text-warning">10+ Years Experience</h4>
             <p className="text-muted">
               Helping Tamils find their life partners since 2015.
             </p>
           </div>
-          <div className="col-md-4 mb-4">
+          <div className="col-12 col-md-4 mb-4">
             <h4 className="text-warning">1M+ Profiles</h4>
             <p className="text-muted">
               A growing community of verified and trusted members.
             </p>
           </div>
-          <div className="col-md-4 mb-4">
+          <div className="col-12 col-md-4 mb-4">
             <h4 className="text-warning">24/7 Support</h4>
             <p className="text-muted">
               Dedicated team to help you every step of the way.
