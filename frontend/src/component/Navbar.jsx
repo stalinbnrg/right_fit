@@ -7,16 +7,16 @@ export default function Navbar() {
 
   return (
     <nav className="bg-orange-600 text-white px-6 py-3 flex justify-between items-center shadow-md">
-      {/* Left side title */}
+      {/* Left side - App Name */}
       <h1 className="text-lg font-bold">
         <Link to="/">My App</Link>
       </h1>
 
-      {/* Right side profile */}
+      {/* Right side - Profile Dropdown */}
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center space-x-2 focus:outline-none"
+          className="flex items-center focus:outline-none"
         >
           <img
             src="https://i.pravatar.cc/40"
@@ -34,7 +34,7 @@ export default function Navbar() {
               }}
               className="block w-full text-left px-4 py-2 hover:bg-orange-100"
             >
-              My-profile
+              Profile
             </button>
             <button
               onClick={() => {

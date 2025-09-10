@@ -46,7 +46,7 @@ const { sequelize } = require("../../config/db");
 const UserProfileModel = require("./UserProfile");
 const UserExpectationModel = require("./UserExpectation");
 
-// Initialize models
+// Initialize models 
 const UserProfile = UserProfileModel(sequelize);
 const UserExpectation = UserExpectationModel(sequelize);
 
