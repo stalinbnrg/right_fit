@@ -2,6 +2,7 @@ const { UserExpectation } = require("../models");
 const { body, validationResult } = require("express-validator");
 
 // POST /api/expectation
+// POST /api/expectation OR /api/expectation/:id (admin update)
 exports.createOrUpdateExpectation = [
   body("preferred_age_min").optional().isInt({ min: 18 }),
   body("preferred_age_max").optional().isInt({ min: 18 }),
@@ -11,19 +12,20 @@ exports.createOrUpdateExpectation = [
       return res.status(400).json({ errors: errors.array() });
 
     try {
-      const userId = req.user.id;
+      let userId = req.user.id; // default = logged-in user
+
+      // If admin & param exists → update other user
+      if (req.user.role === "admin" && req.params.id) {
+        userId = req.params.id;
+      }
+
       const payload = req.body;
 
-      // Find existing expectation for this user
-      let expectation = await UserExpectation.findOne({
-        where: { user_id: userId },
-      });
+      let expectation = await UserExpectation.findOne({ where: { user_id: userId } });
 
       if (expectation) {
-        // Update existing record
         await expectation.update(payload);
       } else {
-        // Create new record
         expectation = await UserExpectation.create({
           user_id: userId,
           ...payload,
@@ -40,6 +42,7 @@ exports.createOrUpdateExpectation = [
     }
   },
 ];
+
 
 
 //GET /api/expectations
