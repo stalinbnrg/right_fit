@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -54,27 +54,30 @@ const Register = () => {
       setMessageType("error");
     }
   };
-// Auto verify OTP when length is 6
-useEffect(() => {
-  const autoVerify = async () => {
-    if (otp.length === 6 && otpSent && !otpVerified) {
-      try {
-        const res = await axios.post("http://localhost:5000/api/auth/verify-otp", {
-          email: profile.email,
-          otp,
-        });
-        localStorage.setItem("token", res.data.token);
-        setOtpVerified(true);
-        setMessage("OTP verified successfully");
-        setMessageType("success");
-      } catch (err) {
-        setMessage(err.response?.data?.message || "Error verifying OTP");
-        setMessageType("error");
+  // Auto verify OTP when length is 6
+  useEffect(() => {
+    const autoVerify = async () => {
+      if (otp.length === 6 && otpSent && !otpVerified) {
+        try {
+          const res = await axios.post(
+            "http://localhost:5000/api/auth/verify-otp",
+            {
+              email: profile.email,
+              otp,
+            }
+          );
+          localStorage.setItem("token", res.data.token);
+          setOtpVerified(true);
+          setMessage("OTP verified successfully");
+          setMessageType("success");
+        } catch (err) {
+          setMessage(err.response?.data?.message || "Error verifying OTP");
+          setMessageType("error");
+        }
       }
-    }
-  };
-  autoVerify();
-}, [otp, otpSent, otpVerified, profile.email]);
+    };
+    autoVerify();
+  }, [otp, otpSent, otpVerified, profile.email]);
 
   // const verifyOtp = async () => {
   //   try {
@@ -114,7 +117,9 @@ useEffect(() => {
       setMessageType("success");
       setTimeout(() => navigate("/home"), 1200); // redirect after small delay
     } catch (err) {
-      setMessage(err.response?.data?.message || "Error submitting expectations");
+      setMessage(
+        err.response?.data?.message || "Error submitting expectations"
+      );
       setMessageType("error");
     }
   };
@@ -259,18 +264,18 @@ useEffect(() => {
                 onChange={handleProfileChange}
               />
             </div>
-{otpSent && !otpVerified && (
-  <div className="mb-3">
-    <label className="form-label">Enter OTP</label>
-    <input
-      type="text"
-      className="form-control"
-      value={otp}
-      onChange={(e) => setOtp(e.target.value)}
-      maxLength={6} // assuming 6-digit OTP
-    />
-  </div>
-)}
+            {otpSent && !otpVerified && (
+              <div className="mb-3">
+                <label className="form-label">Enter OTP</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  maxLength={6} // assuming 6-digit OTP
+                />
+              </div>
+            )}
 
             {/* {otpSent && !otpVerified && (
               <div className="mb-3">
