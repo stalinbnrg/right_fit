@@ -110,7 +110,7 @@ const Register = () => {
           preferred_salary_max: expectation.salary_max,
         },
         {
-          headers: { Authorization: Bearer ${token} },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setMessage("Registered Successfully!");
@@ -128,7 +128,7 @@ const Register = () => {
     <div
       className="container-fluid d-flex justify-content-center align-items-center"
       style={{
-        backgroundImage: url(${Background}),
+        backgroundImage: `url(${Background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
