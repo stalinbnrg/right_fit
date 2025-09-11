@@ -3,17 +3,26 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Pages
-import Login from "./pages/login";
+import Login from "./pages/login";      
 import Register from "./pages/Register";
+import Home from "./pages/Home";
+import Profile from "./pages/profile";
+
+// Components
 import CustomCursor from "./components/CustomCursor";
 
 function App() {
   return (
     <Router>
-        <CustomCursor />
+      <CustomCursor />
       <Routes>
-        <Route path="/" element={<Login />} />
+        {/* Auth routes */}
+        <Route path="/" element={<Login />} />         
         <Route path="/register" element={<Register />} />
+
+        {/* Main app routes */}
+        <Route path="/home" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
