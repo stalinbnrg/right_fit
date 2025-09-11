@@ -54,6 +54,7 @@ const Register = () => {
       setMessageType("error");
     }
   };
+
   // Auto verify OTP when length is 6
   useEffect(() => {
     const autoVerify = async () => {
@@ -79,25 +80,7 @@ const Register = () => {
     autoVerify();
   }, [otp, otpSent, otpVerified, profile.email]);
 
-  // const verifyOtp = async () => {
-  //   try {
-  //     const res = await axios.post(
-  //       "http://localhost:5000/api/auth/verify-otp",
-  //       {
-  //         email: profile.email,
-  //         otp,
-  //       }
-  //     );
-  //     localStorage.setItem("token", res.data.token);
-  //     setOtpVerified(true);
-  //     setMessage("OTP verified successfully");
-  //     setMessageType("success");
-  //   } catch (err) {
-  //     setMessage(err.response?.data?.message || "Error verifying OTP");
-  //     setMessageType("error");
-  //   }
-  // };
-
+  // Submit expectations
   const submitExpectations = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -110,7 +93,7 @@ const Register = () => {
           preferred_salary_max: expectation.salary_max,
         },
         {
-          headers: { Authorization: Bearer ${token} },
+          headers: { Authorization: `Bearer ${token}` }, // ✅ fixed
         }
       );
       setMessage("Registered Successfully!");
@@ -128,7 +111,7 @@ const Register = () => {
     <div
       className="container-fluid d-flex justify-content-center align-items-center"
       style={{
-        backgroundImage: url(${Background}),
+        backgroundImage: `url(${Background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -272,25 +255,10 @@ const Register = () => {
                   className="form-control"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  maxLength={6} // assuming 6-digit OTP
+                  maxLength={6}
                 />
               </div>
             )}
-
-            {/* {otpSent && !otpVerified && (
-              <div className="mb-3">
-                <label className="form-label">Enter OTP</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                />
-                <button className="btn btn-primary mt-2" onClick={verifyOtp}>
-                  Verify OTP
-                </button>
-              </div>
-            )} */}
 
             {!otpSent && (
               <button className="btn btn-primary" onClick={sendOtp}>
@@ -310,7 +278,6 @@ const Register = () => {
               </button>
             )}
 
-            {/* inline message */}
             {message && (
               <p
                 className={
@@ -376,7 +343,6 @@ const Register = () => {
               Finish Registration
             </button>
 
-            {/* inline message */}
             {message && (
               <p
                 className={
