@@ -65,7 +65,7 @@ const Home = () => {
               <p className="text-light mb-2">Already registered?</p>
               <button
                 className="btn btn-lg btn-outline-warning w-100"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/signin")}
               >
                 Login
               </button>

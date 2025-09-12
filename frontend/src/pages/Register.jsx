@@ -93,12 +93,12 @@ const Register = () => {
           preferred_salary_max: expectation.salary_max,
         },
         {
-          headers: { Authorization: `Bearer ${token}` }, // ✅ fixed
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setMessage("Registered Successfully!");
       setMessageType("success");
-      setTimeout(() => navigate("/home"), 1200); // redirect after small delay
+      setTimeout(() => navigate("/home"), 1200);
     } catch (err) {
       setMessage(
         err.response?.data?.message || "Error submitting expectations"
@@ -109,57 +109,42 @@ const Register = () => {
 
   return (
     <div
-      className="container-fluid d-flex justify-content-center align-items-center"
+      className="container-fluid d-flex justify-content-center align-items-center p-3"
       style={{
         backgroundImage: `url(${Background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        height: "100vh",
+        minHeight: "100vh",
         width: "100vw",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
       }}
     >
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "white",
-          padding: "2rem",
-          textAlign: "center",
-        }}
-      >
-        <div>
+      <div className="row w-100 align-items-center">
+        {/* Left Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -80 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="col-12 col-lg-6 text-center text-lg-start mb-4 mb-lg-0"
+        >
           <img
             src={Logo}
             alt="Logo"
-            style={{
-              width: "150px",
-              height: "150px",
-              objectFit: "cover",
-              borderRadius: "50%",
-              marginBottom: "1rem",
-              border: "2px solid white",
-            }}
+            className="img-fluid rounded-circle border border-3 border-white shadow-lg mb-4"
+            style={{ width: "120px", height: "120px", objectFit: "cover" }}
           />
           <h1
+            className="fw-bold display-5"
             style={{
-              fontWeight: "bolder",
               color: "#fff",
               WebkitTextStroke: "1px black",
-              fontSize: "3.5rem",
             }}
           >
             Welcome to Our Platform
           </h1>
           <p
+            className="lead fw-semibold"
             style={{
-              fontWeight: "bold",
-              fontSize: "1.2rem",
               color: "black",
               WebkitTextStroke: "0.5px white",
             }}
@@ -167,196 +152,218 @@ const Register = () => {
             The most trusted matrimony service for universities – find your
             perfect match today!
           </p>
-        </div>
+        </motion.div>
+
+        {/* Right Section (Form) */}
+        <motion.div
+          initial={{ opacity: 0, y: 80 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="col-12 col-lg-6 d-flex justify-content-center"
+        >
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            className="card p-4 shadow-lg"
+            style={{
+              maxWidth: "500px",
+              width: "100%",
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              backdropFilter: "blur(15px)",
+              borderRadius: "15px",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+            }}
+          >
+            {step === 1 && (
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h3 className="mb-4 text-center fw-bold">Profile Details</h3>
+
+                <div className="mb-3">
+                  <label className="form-label">Full Name</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="full_name"
+                    placeholder="Enter your name"
+                    value={profile.full_name}
+                    onChange={handleProfileChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Gender</label>
+                  <select
+                    name="gender"
+                    className="form-select"
+                    value={profile.gender}
+                    onChange={handleProfileChange}
+                  >
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Date of Birth</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="dob"
+                    value={profile.dob}
+                    onChange={handleProfileChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Phone Number</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="phone_number"
+                    placeholder="Enter your phone number"
+                    value={profile.phone_number}
+                    onChange={handleProfileChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Email</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    name="email"
+                    placeholder="Enter your email"
+                    value={profile.email}
+                    onChange={handleProfileChange}
+                  />
+                </div>
+
+                {otpSent && !otpVerified && (
+                  <div className="mb-3">
+                    <label className="form-label">Enter OTP</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      maxLength={6}
+                      placeholder="Enter 6-digit OTP"
+                    />
+                  </div>
+                )}
+
+                {!otpSent && (
+                  <button className="btn btn-primary w-100" onClick={sendOtp}>
+                    Generate OTP
+                  </button>
+                )}
+
+                {otpVerified && (
+                  <button
+                    className="btn btn-success w-100 mt-3"
+                    onClick={() => {
+                      setStep(2);
+                      setMessage("");
+                    }}
+                  >
+                    Next
+                  </button>
+                )}
+
+                {message && (
+                  <p
+                    className={`mt-2 text-center ${
+                      messageType === "error" ? "text-danger" : "text-success"
+                    }`}
+                  >
+                    {message}
+                  </p>
+                )}
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <h3 className="mb-4 text-center fw-bold">Expectation</h3>
+
+                <div className="mb-3">
+                  <label className="form-label">Education</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="education"
+                    value={expectation.education}
+                    onChange={handleExpectationChange}
+                    placeholder="Expected education"
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Occupation</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="occupation"
+                    value={expectation.occupation}
+                    onChange={handleExpectationChange}
+                    placeholder="Expected occupation"
+                  />
+                </div>
+
+                <div className="row">
+                  <div className="col-6 mb-3">
+                    <label className="form-label">Min Salary</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="salary_min"
+                      value={expectation.salary_min}
+                      placeholder="Min"
+                      onChange={handleExpectationChange}
+                    />
+                  </div>
+                  <div className="col-6 mb-3">
+                    <label className="form-label">Max Salary</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="salary_max"
+                      value={expectation.salary_max}
+                      placeholder="Max"
+                      onChange={handleExpectationChange}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  className="btn btn-success w-100"
+                  onClick={submitExpectations}
+                >
+                  Finish Registration
+                </button>
+
+                {message && (
+                  <p
+                    className={`mt-2 text-center ${
+                      messageType === "error" ? "text-danger" : "text-success"
+                    }`}
+                  >
+                    {message}
+                  </p>
+                )}
+              </motion.div>
+            )}
+          </motion.div>
+        </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-        className="card p-4"
-        style={{
-          maxWidth: "600px",
-          width: "90%",
-          backgroundColor: "rgba(255, 255, 255, 0.2)",
-          backdropFilter: "blur(100px)",
-          borderRadius: "10px",
-          border: "1px solid rgba(255, 255, 255, 0.3)",
-        }}
-      >
-        {step === 1 && (
-          <div>
-            <h3 className="mb-4 text-center fw-bold">Profile Details</h3>
-            <div className="mb-3">
-              <label className="form-label">Full Name</label>
-              <input
-                type="text"
-                className="form-control"
-                name="full_name"
-                placeholder="Enter your name"
-                value={profile.full_name}
-                onChange={handleProfileChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Gender</label>
-              <select
-                name="gender"
-                className="form-select"
-                value={profile.gender}
-                onChange={handleProfileChange}
-              >
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-              </select>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Date of Birth</label>
-              <input
-                type="date"
-                className="form-control"
-                name="dob"
-                value={profile.dob}
-                onChange={handleProfileChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Phone Number</label>
-              <input
-                type="text"
-                className="form-control"
-                name="phone_number"
-                placeholder="Enter your phone number"
-                value={profile.phone_number}
-                onChange={handleProfileChange}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                name="email"
-                placeholder="Enter your email"
-                value={profile.email}
-                onChange={handleProfileChange}
-              />
-            </div>
-            {otpSent && !otpVerified && (
-              <div className="mb-3">
-                <label className="form-label">Enter OTP</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  maxLength={6}
-                />
-              </div>
-            )}
-
-            {!otpSent && (
-              <button className="btn btn-primary" onClick={sendOtp}>
-                Generate OTP
-              </button>
-            )}
-
-            {otpVerified && (
-              <button
-                className="btn btn-primary mt-3"
-                onClick={() => {
-                  setStep(2);
-                  setMessage("");
-                }}
-              >
-                Next
-              </button>
-            )}
-
-            {message && (
-              <p
-                className={
-                  messageType === "error"
-                    ? "text-danger mt-2"
-                    : "text-success mt-2"
-                }
-              >
-                {message}
-              </p>
-            )}
-          </div>
-        )}
-
-        {step === 2 && (
-          <div>
-            <h3 className="mb-4">Expectation</h3>
-
-            <div className="mb-3">
-              <label className="form-label">Education</label>
-              <input
-                type="text"
-                className="form-control"
-                name="education"
-                value={expectation.education}
-                onChange={handleExpectationChange}
-                placeholder="enter your expected education"
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Occupation</label>
-              <input
-                type="text"
-                className="form-control"
-                name="occupation"
-                value={expectation.occupation}
-                onChange={handleExpectationChange}
-                placeholder="enter your expected occupation"
-              />
-            </div>
-
-            <div className="mb-3 flex-row">
-              <label className="form-label">Salary</label>
-              <input
-                type="number"
-                className="form-control mb-2"
-                name="salary_min"
-                value={expectation.salary_min}
-                placeholder="Min"
-                onChange={handleExpectationChange}
-              />
-              <input
-                type="number"
-                className="form-control"
-                name="salary_max"
-                value={expectation.salary_max}
-                placeholder="Max"
-                onChange={handleExpectationChange}
-              />
-            </div>
-            <button className="btn btn-success" onClick={submitExpectations}>
-              Finish Registration
-            </button>
-
-            {message && (
-              <p
-                className={
-                  messageType === "error"
-                    ? "text-danger mt-2"
-                    : "text-success mt-2"
-                }
-              >
-                {message}
-              </p>
-            )}
-          </div>
-        )}
-      </motion.div>
     </div>
   );
 };
