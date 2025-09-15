@@ -3,11 +3,10 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 // Pages
-import Login from "./pages/login";
+import Login from "./pages/login"; // ✅ corrected case
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Profile from "./pages/profile";
-import RegisteredUserLogin from "./pages/RegisteredUserLogin";
 
 // Components
 import CustomCursor from "./components/CustomCursor";
@@ -29,49 +28,13 @@ function App() {
     <Router>
       <CustomCursor />
       <Routes>
-        {/* Public routes (redirect to /home if already logged in) */}
-        <Route
-          path="/"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/signin"
-          element={
-            <PublicRoute>
-              <RegisteredUserLogin />
-            </PublicRoute>
-          }
-        />
+        {/* Auth routes */}
+        <Route path="/" element={<Login />} />         
+        <Route path="/register" element={<Register />} />
 
-        {/* Protected routes (require token) */}
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        {/* Main app routes */}
+        <Route path="/home" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
