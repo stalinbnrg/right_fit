@@ -1,0 +1,26 @@
+.home-page {
+  /* Background image with full cover */
+  background: url("src/assets/home-bg.jpg") no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+/* Transparent dark overlay */
+.home-page::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5); /* dark overlay */
+  z-index: -1;
+}
+
+/* Content box styling */
+.content-box {
+  background: rgba(255, 152, 0, 0.85); /* orange translucent */
+  color: #fff;
+  max-width: 700px;
+  margin: auto;
+}
