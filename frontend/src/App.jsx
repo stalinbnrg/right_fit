@@ -9,9 +9,6 @@ import Home from "./pages/Home";
 import Profile from "./pages/profile";
 import RegisteredUserLogin from "./pages/RegisteredUserLogin";
 
-// Components
-import CustomCursor from "./components/CustomCursor";
-
 // Protected route wrapper
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token"); // or sessionStorage
@@ -27,7 +24,6 @@ const PublicRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <CustomCursor />
       <Routes>
         {/* Public routes (redirect to /home if already logged in) */}
         <Route
