@@ -14,7 +14,7 @@ const MatchProfile = () => {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(`/api/user/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }, 
+          headers: { Authorization: `Bearer ${token}` },
         });
         setProfile(res.data);
       } catch (err) {
