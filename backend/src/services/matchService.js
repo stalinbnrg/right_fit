@@ -1,21 +1,32 @@
-function scoreCandidate(user, expectation){
-    if(!user || !expectation) return 0;
+// src/utils/scoreCandidate.js
+function scoreCandidate(user, expectation) {
+    if (!user || !expectation) return 0;
     let score = 0;
-    
+
     // Age
-    if(user.age && expectation.preferred_age_min != null && expectation.preferred_age_max != null){
-        if(user.age >= expectation.preferred_age_min && user.age <= expectation.preferred_age_max)
-            score += 20;
+    if (user.age != null && expectation.preferred_age_min != null && expectation.preferred_age_max != null) {
+        if (user.age >= expectation.preferred_age_min && user.age <= expectation.preferred_age_max) score += 20;
     }
 
-    // caste
-    if(expectation.preferred_caste && user.caste && expectation.preferred_caste.toLowerCase() === user.caste.toLowerCase())score += 15;
+    // Caste
+    if (expectation.preferred_caste && user.caste) {
+        if (user.caste.toLowerCase().includes(expectation.preferred_caste.toLowerCase())) score += 15;
+    }
+
     // Religion
-    if (expectation.preferred_religion && user.religion && expectation.preferred_religion.toLowerCase() === user.religion.toLowerCase()) score += 10;
+    if (expectation.preferred_religion && user.religion) {
+        if (user.religion.toLowerCase().includes(expectation.preferred_religion.toLowerCase())) score += 10;
+    }
+
     // Education
-    if (expectation.preferred_education && user.education && expectation.preferred_education.toLowerCase() === user.education.toLowerCase()) score += 10;
+    if (expectation.preferred_education && user.education) {
+        if (user.education.toLowerCase().includes(expectation.preferred_education.toLowerCase())) score += 10;
+    }
+
     // Occupation
-    if (expectation.preferred_occupation && user.occupation && expectation.preferred_occupation.toLowerCase() === user.occupation.toLowerCase()) score += 10;
+    if (expectation.preferred_occupation && user.occupation) {
+        if (user.occupation.toLowerCase().includes(expectation.preferred_occupation.toLowerCase())) score += 10;
+    }
 
     // Salary
     if (user.salary != null && expectation.preferred_salary_min != null && expectation.preferred_salary_max != null) {
@@ -23,15 +34,31 @@ function scoreCandidate(user, expectation){
         if (s >= parseFloat(expectation.preferred_salary_min) && s <= parseFloat(expectation.preferred_salary_max)) score += 15;
     }
 
-    // Location - simple substring match across city/state/country vs preferred_location
-    if (expectation.preferred_location && (
-        (user.location_city && expectation.preferred_location.toLowerCase().includes(user.location_city.toLowerCase())) ||
-        (user.location_state && expectation.preferred_location.toLowerCase().includes(user.location_state.toLowerCase())) ||
-        (user.location_country && expectation.preferred_location.toLowerCase().includes(user.location_country.toLowerCase()))
-    )) score += 10;
+    // Height
+    if (user.height_cm != null && expectation.preferred_height_min != null && expectation.preferred_height_max != null) {
+        const h = parseFloat(user.height_cm);
+        if (h >= parseFloat(expectation.preferred_height_min) && h <= parseFloat(expectation.preferred_height_max)) score += 10;
+    }
 
-    // Other expectations - naive substring check
-    if (expectation.other_expectations && user.about_me && user.about_me.toLowerCase().includes(expectation.other_expectations.toLowerCase())) score += 10;
+    // Location (city/state/country)
+    if (expectation.preferred_location_city && user.location_city) {
+        if (user.location_city.toLowerCase() === expectation.preferred_location_city.toLowerCase()) score += 5;
+    }
+    if (expectation.preferred_location_state && user.location_state) {
+        if (user.location_state.toLowerCase() === expectation.preferred_location_state.toLowerCase()) score += 3;
+    }
+    if (expectation.preferred_location_country && user.location_country) {
+        if (user.location_country.toLowerCase() === expectation.preferred_location_country.toLowerCase()) score += 2;
+    }
+
+    // Other expectations (keywords)
+    if (expectation.other_expectations && user.about_me) {
+        const keywords = expectation.other_expectations.toLowerCase().split(/[,;]+/);
+        const about = user.about_me.toLowerCase();
+        keywords.forEach((kw) => {
+            if (kw && about.includes(kw.trim())) score += 2;
+        });
+    }
 
     return score;
 }

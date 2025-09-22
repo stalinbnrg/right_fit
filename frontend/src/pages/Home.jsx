@@ -46,13 +46,15 @@ const Home = () => {
         const expectationFields = [
           "preferred_education",
           "preferred_occupation",
-          "preferred_caste",
-          "preferred_religion",
+          "preferred_age_min",
+          "preferred_age_min",
+          "preferred_height_min",
+          "preferred_height_max",
           "preferred_salary_min",
           "preferred_salary_max",
-          "preferred_age",
-          "preferred_height",
-          "preferred_location",
+          "preferred_location_city",
+          "preferred_location_state",
+          "preferred_location_country",
           "other_expectations",
         ];
 

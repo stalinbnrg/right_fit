@@ -30,11 +30,10 @@ const Profile = () => {
         setExpectation(userData.expectation || {});
         setUserId(userData.id);
 
-        // Calculate age if DOB exists
+        // Calculate age
         if (userData.dob) {
           const age = Math.floor(
-            (new Date() - new Date(userData.dob)) /
-              (365.25 * 24 * 60 * 60 * 1000)
+            (new Date() - new Date(userData.dob)) / (365.25 * 24 * 60 * 60 * 1000)
           );
           setProfile((prev) => ({ ...prev, age }));
         }
@@ -42,16 +41,15 @@ const Profile = () => {
       .catch((err) => {
         console.error("Fetch error:", err);
         setMessage("Failed to fetch profile data.");
-        setTimeout(() => setMessage(""), 3000);
+        setTimeout(() => setMessage(""), 6000);
       });
   }, [token]);
 
-  // Handle profile form changes
+  // Profile form change
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
 
-    // Calculate age if DOB changes
     if (name === "dob" && value) {
       const age = Math.floor(
         (new Date() - new Date(value)) / (365.25 * 24 * 60 * 60 * 1000)
@@ -60,171 +58,108 @@ const Profile = () => {
     }
   };
 
-  // Handle expectation form changes
+  // Expectation form change
   const handleExpectationChange = (e) => {
     const { name, value } = e.target;
     setExpectation((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle profile photo upload
+  // Image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfile((prev) => ({
-          ...prev,
-          profile_photo_url: reader.result,
-        }));
+        setProfile((prev) => ({ ...prev, profile_photo_url: reader.result }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Save profile to backend
-  // Save profile to backend
-const handleSaveProfile = () => {
-  if (!userId) {
-    setMessage("User ID not found!");
-    return;
-  }
+  // Save profile
+  const handleSaveProfile = () => {
+    if (!userId) {
+      setMessage("User ID not found!");
+      return;
+    }
 
-  // Prepare payload
-  const payload = { ...profile };
-
-  // If photoFile exists, convert to base64
-  if (photoFile) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      payload.profile_photo_url = reader.result;
-
+    const saveProfile = (payload) => {
       axios
         .put(`${API}/user/${userId}`, payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         })
         .then((res) => {
-          setMessage("Profile saved successfully!");
+          setMessage("It would be great if you filled out the form completely, but if you didn't, it might be difficult to find a suitable partner for you.");
           setProfile(res.data.user || profile);
-          setTimeout(() => setMessage(""), 3000);
+          setTimeout(() => setMessage(""), 6000);
         })
         .catch((err) => {
           console.error("Save error:", err.response || err);
-          const msg =
-            err.response?.data?.message || "Failed to save profile. Try again!";
+          const msg = err.response?.data?.message || "Failed to save profile. Try again!";
           setMessage(msg);
-          setTimeout(() => setMessage(""), 3000);
+          setTimeout(() => setMessage(""), 6000);
         });
     };
-    reader.readAsDataURL(photoFile);
-  } else {
-    axios
-      .put(`${API}/user/${userId}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        setMessage("Profile saved successfully!");
-        setProfile(res.data.user || profile);
-        setTimeout(() => setMessage(""), 3000);
-      })
-      .catch((err) => {
-        console.error("Save error:", err.response || err);
-        const msg =
-          err.response?.data?.message || "Failed to save profile. Try again!";
-        setMessage(msg);
-        setTimeout(() => setMessage(""), 3000);
-      });
-  }
-};
 
-
-  // Save expectation to backend
-// Save expectation to backend
-const handleSaveExpectation = () => {
-  if (!userId) {
-    setMessage("User ID not found!");
-    return;
-  }
-
-  // Split age range
-  let ageMin = null, ageMax = null;
-  if (expectation.preferred_age) {
-    const parts = expectation.preferred_age.split("-").map(p => parseInt(p.trim()));
-    if (parts.length === 2) {
-      ageMin = !isNaN(parts[0]) ? parts[0] : null;
-      ageMax = !isNaN(parts[1]) ? parts[1] : null;
+    if (photoFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => saveProfile({ ...profile, profile_photo_url: reader.result });
+      reader.readAsDataURL(photoFile);
+    } else {
+      saveProfile(profile);
     }
-  }
-
-  // Split height range
-  let heightMin = null, heightMax = null;
-  if (expectation.preferred_height) {
-    const parts = expectation.preferred_height.split("-").map(p => parseInt(p.trim()));
-    if (parts.length === 2) {
-      heightMin = !isNaN(parts[0]) ? parts[0] : null;
-      heightMax = !isNaN(parts[1]) ? parts[1] : null;
-    }
-  }
-
-  // Split location safely
-  let city = "", state = "", country = "";
-  if (expectation.preferred_location) {
-    const locParts = expectation.preferred_location.split(",");
-    city = locParts[0]?.trim() || "";
-    state = locParts[1]?.trim() || "";
-    country = locParts[2]?.trim() || "";
-  }
-
-  const payload = {
-    user_id: userId,
-    preferred_education: expectation.preferred_education || "",
-    preferred_occupation: expectation.preferred_occupation || "",
-    preferred_caste: expectation.preferred_caste || "",
-    preferred_religion: expectation.preferred_religion || "",
-    other_expectations: expectation.other_expectations || "",
-    preferred_salary_min: Number(expectation.preferred_salary_min) || 0,
-    preferred_salary_max: Number(expectation.preferred_salary_max) || 0,
-    preferred_age_min: ageMin,
-    preferred_age_max: ageMax,
-    preferred_height_min: heightMin,
-    preferred_height_max: heightMax,
-    preferred_location_city: city,
-    preferred_location_state: state,
-    preferred_location_country: country,
   };
 
-  // Remove undefined/null values to satisfy backend validation
-  Object.keys(payload).forEach(
-    key => (payload[key] === null || payload[key] === "") && delete payload[key]
-  );
+  // Save expectation
+  const handleSaveExpectation = () => {
+    if (!userId) {
+      setMessage("User ID not found!");
+      return;
+    }
 
-  axios
-    .post(`${API}/expectation`, payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then(() => {
-      setMessage("Expectation saved successfully!");
-      setTimeout(() => setMessage(""), 3000);
-    })
-    .catch((err) => {
-      console.error("Expectation save error:", err.response || err);
-      const msg =
-        err.response?.data?.message ||
-        (err.response?.data?.errors
-          ? err.response.data.errors.map((e) => e.msg).join(", ")
-          : "Failed to save expectation. Try again!");
-      setMessage(msg);
-      setTimeout(() => setMessage(""), 3000);
-    });
-};
+    const payload = {
+      user_id: userId,
+      preferred_education: expectation.preferred_education || "",
+      preferred_occupation: expectation.preferred_occupation || "",
+      preferred_caste: expectation.preferred_caste || "",
+      preferred_religion: expectation.preferred_religion || "",
+      other_expectations: expectation.other_expectations || "",
+      preferred_salary_min: Number(expectation.preferred_salary_min) || 0,
+      preferred_salary_max: Number(expectation.preferred_salary_max) || 0,
+      preferred_age_min: expectation.preferred_age_min || null,
+      preferred_age_max: expectation.preferred_age_max || null,
+      preferred_height_min: expectation.preferred_height_min || null,
+      preferred_height_max: expectation.preferred_height_max || null,
+      preferred_location_city: expectation.preferred_location_city || "",
+      preferred_location_state: expectation.preferred_location_state || "",
+      preferred_location_country: expectation.preferred_location_country || "",
+    };
 
+    // Remove empty/null keys
+    Object.keys(payload).forEach(
+      (key) => (payload[key] === null || payload[key] === "") && delete payload[key]
+    );
 
+    axios
+      .post(`${API}/expectation`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        setMessage("It would be great if you filled out the form completely, but if you didn't, it might be difficult to find a suitable partner for you.");
+        setTimeout(() => setMessage(""), 6000);
+      })
+      .catch((err) => {
+        console.error("Expectation save error:", err.response || err);
+        const msg =
+          err.response?.data?.message ||
+          (err.response?.data?.errors
+            ? err.response.data.errors.map((e) => e.msg).join(", ")
+            : "Failed to save expectation. Try again!");
+        setMessage(msg);
+        setTimeout(() => setMessage(""), 6000);
+      });
+  };
 
   return (
     <div className="profile-page">
@@ -536,140 +471,191 @@ const handleSaveExpectation = () => {
               </Tab>
 
               {/* Expectation Tab */}
-              <Tab eventKey="expectation" title="Expectation">
-                <Form className="mt-3 text-start">
-                  <Row>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Education</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="preferred_education"
-                          value={expectation.preferred_education || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Occupation</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="preferred_occupation"
-                          value={expectation.preferred_occupation || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+              {/* Expectation Tab */}
+<Tab eventKey="expectation" title="Expectation">
+  <Form className="mt-3 text-start">
+    <Row>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Education</Form.Label>
+          <Form.Control
+            type="text"
+            name="preferred_education"
+            value={expectation.preferred_education || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Occupation</Form.Label>
+          <Form.Control
+            type="text"
+            name="preferred_occupation"
+            value={expectation.preferred_occupation || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
 
-                  <Row>
-                    <Col md={4}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Salary Min</Form.Label>
-                        <Form.Control
-                          type="number"
-                          name="preferred_salary_min"
-                          value={expectation.preferred_salary_min || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Salary Max</Form.Label>
-                        <Form.Control
-                          type="number"
-                          name="preferred_salary_max"
-                          value={expectation.preferred_salary_max || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Age Range</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="preferred_age"
-                          placeholder="e.g., 25-30"
-                          value={expectation.preferred_age || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+    <Row>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Salary Min</Form.Label>
+          <Form.Control
+            type="number"
+            name="preferred_salary_min"
+            value={expectation.preferred_salary_min || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Salary Max</Form.Label>
+          <Form.Control
+            type="number"
+            name="preferred_salary_max"
+            value={expectation.preferred_salary_max || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
 
-                  <Row>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Height</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="preferred_height"
-                          value={expectation.preferred_height || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Caste</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="preferred_caste"
-                          value={expectation.preferred_caste || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+    <Row>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Age Min</Form.Label>
+          <Form.Control
+            type="number"
+            name="preferred_age_min"
+            value={expectation.preferred_age_min || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Age Max</Form.Label>
+          <Form.Control
+            type="number"
+            name="preferred_age_max"
+            value={expectation.preferred_age_max || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
 
-                  <Row>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Religion</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="preferred_religion"
-                          value={expectation.preferred_religion || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Preferred Location</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="preferred_location"
-                          value={expectation.preferred_location || ""}
-                          onChange={handleExpectationChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+    <Row>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Height Min (cm)</Form.Label>
+          <Form.Control
+            type="number"
+            name="preferred_height_min"
+            value={expectation.preferred_height_min || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Height Max (cm)</Form.Label>
+          <Form.Control
+            type="number"
+            name="preferred_height_max"
+            value={expectation.preferred_height_max || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
 
-                  <Form.Group className="mb-3">
-                    <Form.Label>Other Expectations</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={3}
-                      name="other_expectations"
-                      value={expectation.other_expectations || ""}
-                      onChange={handleExpectationChange}
-                    />
-                  </Form.Group>
+    <Row>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Caste</Form.Label>
+          <Form.Control
+            type="text"
+            name="preferred_caste"
+            value={expectation.preferred_caste || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Religion</Form.Label>
+          <Form.Control
+            type="text"
+            name="preferred_religion"
+            value={expectation.preferred_religion || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
 
-                  <Button
-                    variant="success"
-                    className="mt-3 w-100"
-                    onClick={handleSaveExpectation}
-                  >
-                    Save Expectation
-                  </Button>
-                </Form>
-              </Tab>
+    <Row>
+      <Col md={4}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Location City</Form.Label>
+          <Form.Control
+            type="text"
+            name="preferred_location_city"
+            value={expectation.preferred_location_city || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={4}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Location State</Form.Label>
+          <Form.Control
+            type="text"
+            name="preferred_location_state"
+            value={expectation.preferred_location_state || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={4}>
+        <Form.Group className="mb-3">
+          <Form.Label>Preferred Location Country</Form.Label>
+          <Form.Control
+            type="text"
+            name="preferred_location_country"
+            value={expectation.preferred_location_country || ""}
+            onChange={handleExpectationChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
+
+    <Form.Group className="mb-3">
+      <Form.Label>Other Expectations</Form.Label>
+      <Form.Control
+        as="textarea"
+        rows={3}
+        name="other_expectations"
+        value={expectation.other_expectations || ""}
+        onChange={handleExpectationChange}
+      />
+    </Form.Group>
+
+    <Button
+      variant="success"
+      className="mt-3 w-100"
+      onClick={handleSaveExpectation}
+    >
+      Save Expectation
+    </Button>
+  </Form>
+</Tab>
+
             </Tabs>
           </Col>
         </Row>
