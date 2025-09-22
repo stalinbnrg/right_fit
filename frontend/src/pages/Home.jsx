@@ -1,89 +1,86 @@
 import React, { useEffect, useState } from "react";
+import { Navbar, Container, Nav, Button, Row, Col, Image, ProgressBar } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { Navbar, Container, Nav, Image, ProgressBar } from "react-bootstrap";
 import axios from "axios";
-import "./Home.css"; // import custom CSS
+import MatchCard from "../components/MatchCard";
+import "./Home.css";
 import ProfilePic from "../assets/default-avatar.png";
 
 const API = "http://localhost:5000/api";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [matches, setMatches] = useState([]);
   const [profile, setProfile] = useState({});
   const [completion, setCompletion] = useState(0);
 
-  const token = localStorage.getItem("token");
-
+  // Fetch user profile for completion %
   useEffect(() => {
+    const token = localStorage.getItem("token");
     if (!token) return;
 
-    axios
-      .get(`${API}/user/me`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get(`${API}/user/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = res.data || {};
         setProfile(data);
 
-        // Calculate profile completion %
+        // Calculate profile completion
         const profileFields = [
-          "full_name",
-          "gender",
-          "dob",
-          "phone_number",
-          "caste",
-          "religion",
-          "education",
-          "occupation",
-          "salary",
-          "marital_status",
-          "height_cm",
-          "weight_kg",
-          "hobbies",
-          "about_me",
-          "location_city",
-          "location_state",
+          "full_name", "gender", "dob", "phone_number", "caste", "religion",
+          "education", "occupation", "salary", "marital_status", "height_cm",
+          "weight_kg", "hobbies", "about_me", "location_city", "location_state",
           "location_country",
         ];
         const expectationFields = [
-          "preferred_education",
-          "preferred_occupation",
-          "preferred_age_min",
-          "preferred_age_min",
-          "preferred_height_min",
-          "preferred_height_max",
-          "preferred_salary_min",
-          "preferred_salary_max",
-          "preferred_location_city",
-          "preferred_location_state",
-          "preferred_location_country",
+          "preferred_education", "preferred_occupation", "preferred_age_min",
+          "preferred_age_max", "preferred_height_min", "preferred_height_max",
+          "preferred_salary_min", "preferred_salary_max",
+          "preferred_location_city", "preferred_location_state", "preferred_location_country",
           "other_expectations",
         ];
 
         let filled = 0;
-        profileFields.forEach((f) => data[f] && filled++);
+        profileFields.forEach(f => data[f] && filled++);
         if (data.expectation) {
-          expectationFields.forEach((f) => data.expectation[f] && filled++);
+          expectationFields.forEach(f => data.expectation[f] && filled++);
         }
 
         const totalFields = profileFields.length + expectationFields.length;
         setCompletion(Math.round((filled / totalFields) * 100));
-      })
-      .catch((err) => console.error(err));
-  }, [token]);
 
-  const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")) {
-      localStorage.removeItem("token"); // clear token
-      navigate("/"); // redirect to login page
-    }
-  };
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // Fetch matches
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API}/match`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setMatches(res.data.matches || []);
+      } catch (err) {
+        console.error("Error fetching matches:", err);
+      }
+    };
+    fetchMatches();
+  }, []);
 
   return (
     <div className="home-page">
-      {/* Top Navbar */}
+      {/* Navbar */}
       <Navbar bg="dark" variant="dark" expand="lg" className="shadow-sm">
         <Container>
           <div className="d-flex align-items-center">
-            {/* Profile Photo */}
             <Image
               src={profile.profile_photo_url || ProfilePic}
               roundedCircle
@@ -93,7 +90,6 @@ const Home = () => {
               onClick={() => navigate("/profile")}
               className="me-3"
             />
-            {/* Completion Bar */}
             <div style={{ width: 150 }}>
               <ProgressBar
                 now={completion}
@@ -103,27 +99,46 @@ const Home = () => {
             </div>
           </div>
 
-          <Nav className="ms-auto d-flex align-items-center">
-            <button className="btn btn-danger fw-bold" onClick={handleLogout}>
+          <Nav className="ms-auto">
+            <Button
+              variant="warning"
+              className="fw-bold me-2"
+              onClick={() => navigate("/profile")}
+            >
+              Profile
+            </Button>
+            <Button
+              variant="danger"
+              className="fw-bold"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to logout?")) {
+                  localStorage.removeItem("token");
+                  navigate("/");
+                }
+              }}
+            >
               Logout
-            </button>
+            </Button>
           </Nav>
         </Container>
       </Navbar>
 
-      {/* Main Content */}
-      <Container className="mt-5 text-center text-white">
-        <div className="content-box p-4 rounded shadow">
-          <h4 className="fw-bold">
-            Marriage doesn't end bachelor life, it just converts unlimited data
-            into daily one GB pack. If you need more, complete the full profile
-            form.
-          </h4>
-
-          <p className="lead">
-            You are successfully registered. Explore profiles and connect!
-          </p>
-        </div>
+      {/* Matches Section */}
+      <Container className="mt-5 text-white">
+        <h4 className="fw-bold text-center">Your Best Matches</h4>
+        <Row className="mt-4">
+          {matches.length > 0 ? (
+            matches.map((m) => (
+              <Col md={4} key={m.profile.id} className="mb-4">
+                <MatchCard match={m} />
+              </Col>
+            ))
+          ) : (
+            <p className="text-center mt-4">
+              No matches found. Update your expectations!
+            </p>
+          )}
+        </Row>
       </Container>
     </div>
   );
